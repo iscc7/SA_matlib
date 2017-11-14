@@ -1,41 +1,34 @@
 clc,clear
 
-f = @(x)(x.^2-1);
-T_fun = @(Error,t)exp(-(Error)./t);
+f = @(x)-(x-2)^2;
 
 T = 1e4;
-T_decrease = 0.998;
-x_min = -2;
-x_max = 3;
+T_decrease = 0.9999;
+x_min = -10;
+x_max = 10;
 
-range_min = -1;
-range_max = 1;
-find_purpose = 1;
+range = 2;
 
-x_0 = rand*(x_max-x_min);
-y_0 = f(x_0);
-box = [];
-
-for I = 1:1000
-    deta_x = (rand-rand)*(range_max-range_min);
-    x_1 = x_0 + deta_x;
-    if x_1>x_max;
-        x_1 = x_max;
+x0 = x_min+rand*(x_max-x_min);
+y0 = f(x0);
+box = zeros(1,100000);
+for i = 1:100000
+    x1 = x0 + (rand-rand)*(range);
+    if x1<x_min;
+        x1 = x_min;
     end
-    if x_1<x_min;
-        x_1 = x_max;
+    if x1 > x_max
+        x1 = x_max;
     end
-    y_1 = f(x_1);
-    error = y_1 - y_0;
-    
-    if error*find_purpose>0
-        x_0 = x_1;
-    elseif T_fun(error,T)>rand;
-        x_0 = x_1;
+    y1 = f(x1);
+    error = y1-y0;
+    if error >= 0
+        x0 = x1;
+    elseif exp(error/T)>rand;
+        x0 = x1;
     end
-    box = [box, T_fun(error,T)];
-    T = T*T_decrease;  
+    box(i) = exp(error/T);
+    T = T*T_decrease;
 end
-disp(x_0)
-plot(box,'d')
-
+x0
+plot(box)
